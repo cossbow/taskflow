@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hikvision.hbfa.sf.dao.TaskSourceDao">
+
+    <insert id="insert">
+        insert into task_source (name, workflow, type, config, batch, timeout, retries, autostart, remark)
+        values (#{name}, #{workflow}, #{type}, #{config}::json, #{batch}, #{timeout}, #{retries}, #{autostart}, #{remark})
+    </insert>
+
+    <update id="update">
+        update task_source
+        set workflow   = #{workflow},
+            type       = #{type},
+            config     = #{config}::json,
+            batch      = #{batch},
+            timeout    = #{timeout},
+            retries    = #{retries},
+            autostart  = #{autostart},
+            remark     = #{remark},
+            updated_at = now()
+        where id = #{id}
+    </update>
+
+    <delete id="remove">
+        delete
+        from task_source
+        where name = #{name}
+    </delete>
+
+    <select id="find" resultType="TaskSource">
+        select *
+        from task_source
+        where name = #{name}
+    </select>
+
+    <select id="list" resultType="TaskSource">
+        select *
+        from task_source
+        where true
+        <if test="autostart != null">and autostart = #{autostart}</if>
+        limit #{limit} offset #{offset}
+    </select>
+
+</mapper>

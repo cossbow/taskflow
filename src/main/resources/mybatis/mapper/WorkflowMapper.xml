@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hikvision.hbfa.sf.dao.WorkflowDao">
+
+    <select id="insert" parameterType="Workflow" resultType="Long">
+        insert into workflow (name, output_parameters, notifier, notifier_config, timeout, remark)
+        values (#{name}, #{outputParameters}, #{notifier}, #{notifierConfig}::json, #{timeout}, #{remark})
+        returning id
+    </select>
+
+    <update id="update">
+        update workflow
+        set output_parameters = #{outputParameters},
+            notifier          = #{notifier},
+            notifier_config   = #{notifierConfig}::json,
+            timeout           = #{timeout},
+            updated_at        = now()
+        where id = #{id}
+    </update>
+
+    <select id="delete" resultType="Workflow">
+        delete
+        from workflow
+        where id = #{id}
+        returning *
+    </select>
+
+    <select id="get" resultType="Workflow">
+        select *
+        from workflow
+        where id = #{id}
+    </select>
+
+
+    <select id="find" resultType="Workflow">
+        select *
+        from workflow
+        where name = #{name}
+    </select>
+
+
+    <select id="list" resultType="Workflow">
+        select *
+        from workflow
+        where id > #{lastId}
+        order by id
+        limit #{limit}
+    </select>
+
+
+    <insert id="setIO">
+        insert into workflow_node_io (workflow_id, node_id, input_parameters, ignore_error)
+        values (#{workflowId}, #{nodeId}, #{inputParameters}, #{ignoreError})
+        on conflict (workflow_id, node_id) do update
+            set input_parameters = #{inputParameters},
+                ignore_error     = #{ignoreError},
+                updated_at       = now()
+    </insert>
+
+    <delete id="delAllIO">
+        delete
+        from workflow_node_io
+        where workflow_id = #{workflowId}
+    </delete>
+
+
+    <select id="listIO" resultType="WorkflowNodeIo">
+        select *
+        from workflow_node_io
+        where workflow_id = #{workflowId}
+    </select>
+
+
+    <insert id="putEdge">
+        insert into workflow_node_edge (workflow_id, from_node_id, to_node_id)
+        values (#{workflowId}, #{fromNodeId}, #{toNodeId})
+        on conflict do nothing
+    </insert>
+
+    <delete id="delAllEdge">
+        delete
+        from workflow_node_edge
+        where workflow_id = #{workflowId}
+    </delete>
+
+    <select id="listEdge" resultType="WorkflowNodeEdge">
+        select *
+        from workflow_node_edge
+        where workflow_id = #{workflowId}
+    </select>
+
+
+</mapper>

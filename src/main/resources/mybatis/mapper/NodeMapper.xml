@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hikvision.hbfa.sf.dao.NodeDao">
+
+    <select id="insert" resultType="Node">
+        insert into node (name, type, config,
+                          default_arguments, async, submit_config,
+                          max_retries, remark)
+        values (#{name}, #{type}, #{config}::json, #{defaultArguments}, #{async}, #{submitConfig},
+                #{maxRetries}, #{remark})
+        returning *
+    </select>
+
+    <select id="update" resultType="Node">
+        update node
+        set type               = #{type},
+            config             = #{config}::json,
+            default_arguments  = #{defaultArguments},
+            async              = #{async},
+            submit_config      = #{submitConfig},
+            max_retries        = #{maxRetries},
+            remark             = #{remark},
+            updated_at         = now()
+        where id = #{id}
+        returning *
+    </select>
+
+    <select id="delete" resultType="Node">
+        delete
+        from node
+        where id = #{id}
+        returning *
+    </select>
+
+    <select id="find" resultType="Node">
+        select *
+        from node
+        where name = #{name}
+    </select>
+
+    <select id="get" resultType="Node">
+        select *
+        from node
+        where id = #{id}
+    </select>
+
+    <select id="gets" resultType="Node">
+        select *
+        from node
+        where
+        <choose>
+            <when test="ids != null and ids.size()>0">
+                id in
+                (<foreach collection="ids" separator="," item="id">#{id}</foreach>)
+            </when>
+            <otherwise>false</otherwise>
+        </choose>
+    </select>
+
+    <select id="getByNames" resultType="Node">
+        select id, name
+        from node
+        where
+        <choose>
+            <when test="names != null and names.size()>0">
+                name in
+                (<foreach collection="names" separator="," item="name">#{name}</foreach>)
+            </when>
+            <otherwise>false</otherwise>
+        </choose>
+    </select>
+
+    <select id="list" resultType="Node">
+        select *
+        from node
+        where id > #{lastId}
+        <if test="type != null">and type = #{type}</if>
+        order by id
+        limit #{limit}
+    </select>
+
+
+</mapper>

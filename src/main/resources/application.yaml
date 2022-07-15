@@ -1,0 +1,31 @@
+server:
+  port: 9457
+
+spring:
+  application:
+    name: taskflow
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5432/taskflow
+    username: postgres
+    password: postgres
+  jackson:
+    default-property-inclusion: non_null
+  kafka:
+    consumer:
+      group-id: ${spring.application.name}
+
+mybatis:
+  mapper-locations: classpath:mybatis/mapper/**.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  config: classpath:log4j2.xml
+
+task:
+  cache-expires: 1m
+  thread-pool:
+    threads: 4
+    queue-size: 10000
+
